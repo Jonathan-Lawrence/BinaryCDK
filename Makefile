@@ -1,32 +1,32 @@
-#Jonathan Lawrence
-#CS3377.501
-#jml160230@utdallas.edu
-#Makefile for program4
+# Jonathan Lawrence
+# CS3377.501
+# jml160230@utdallas.edu
+# Makefile for program6
 
 
 # Flags for C++ implicit rules
 CXX = g++
-CPPFLAGS = -Wall -I /scratch/perkins/include
+CPPFLAGS = -Wall -g -I/scratch/perkins/include
 
 # Library flags
-LDFLAGS = -L /scratch/perkins/lib
-LIBS = -l cdk -lcurses  
+LDFLAGS = -L/scratch/perkins/lib
+LIBS = -lcdk -lcurses
 
 PROJECTNAME = CS3377.Program6.CDKGit
 
 EXEC = program6
 
-OBJS = BinaryFileHeader.o BinaryFileRecord.o
+OBJS = program6.o
 
 ########################################################################
 
 all: $(EXEC)
 
 clean:
-	rm -f $(OBJS) $(EXEC) *~ \#*
+	rm -f $(OBJS) $(EXEC) *.P *~ \#*
 
 $(EXEC): $(OBJS)
-	$(CXX) -o $@ $(OBJS)
+	$(CXX) -o $@ $(OBJS) $(LDFLAGS) $(LDLIBS) $(LIBS)
 
 backup:
 	@make clean
