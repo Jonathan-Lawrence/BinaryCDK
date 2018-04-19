@@ -3,7 +3,10 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdint.h>
+#include "BinaryFileHeader.h"
+#include "BinaryFileRecord.h"
 #include "cdk.h"
 
 #define MATRIX_WIDTH 5
@@ -11,6 +14,7 @@
 #define BOX_WIDTH 25
 #define MATRIX_NAME_STRING "Binary File Contents"
 #define BINARY_FILE_NAME "cs3377.bin"
+
 using namespace std;
 
 #endif //_PROGRAM6_H_
