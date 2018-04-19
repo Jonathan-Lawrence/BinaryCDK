@@ -6,8 +6,10 @@
 #include "program6.h"
 using namespace std;
 
+const int maxRecordStringLength = 25;
+
 class BinaryFileRecord {
  public:
   uint8_t strLength;
-  char stingBuffer[25];
+  char stringBuffer[maxRecordStringLength];
 };

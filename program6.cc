@@ -4,9 +4,6 @@
 // CS3377.501
 
 #include "program6.h"
-#include "BinaryFileHeader.h"
-#include "BinaryFileRecord.h"
-#include <sstream>
 using namespace std;
 
 int main()
@@ -20,8 +17,9 @@ int main()
   int boxWidths[MATRIX_WIDTH+1] = {BOX_WIDTH, BOX_WIDTH, BOX_WIDTH, BOX_WIDTH, BOX_WIDTH, BOX_WIDTH};
   int boxTypes[MATRIX_WIDTH+1] = {vMIXED, vMIXED, vMIXED, vMIXED, vMIXED, vMIXED};
 
-  //binary file stream
+  //Streams
   fstream file;
+  ostringstream ss;
 
   //Class objects to read from bin file
   BinaryFileHeader header; 
@@ -53,10 +51,6 @@ int main()
   drawCDKMatrix(myMatrix, true);
 
 
-
-
-
-
   //Read from binaryStream
   file.open(BINARY_FILE_NAME, ios::in | ios::binary);
   
@@ -68,38 +62,70 @@ int main()
   file.read(reinterpret_cast<char*>(&header.magicNumber), sizeof(header.magicNumber));
   file.read(reinterpret_cast<char*>(&header.versionNumber), sizeof(header.versionNumber));
   file.read(reinterpret_cast<char*>(&header.numRecords), sizeof(header.numRecords));
-
-  file.close();
   
-  //Convert to strings
-  ostringstream convert;
+  /*
+    First, we will read for the members of the BinaryHeaderFile class.
+    
+    Since it is not an actual instance of the class that is in the 
+    binary file, it is necessary to interpret each member of the 
+    BinaryFileHeader class seperately.
+   */                    
   string magicNum;
-  convert << std::hex << header.magicNumber;
-  magicNum = convert.str();
+  ss << std::hex << header.magicNumber;
+  magicNum = ss.str();
   magicNum = "Magic: 0x" + magicNum;
-  convert.str("");
-
+  ss.str("");
 
   string versionNum;
-  convert << header.versionNumber;
-  versionNum = convert.str();
+  ss << std::dec << header.versionNumber;
+  versionNum = ss.str();
   versionNum = "Version: " + versionNum;
-  convert.str("");
+  ss.str("");
 
   string numRecordsNum;
-  convert << header.numRecords;
-  numRecordsNum = convert.str();
+  ss << header.numRecords;
+  numRecordsNum = ss.str();
   numRecordsNum = "NumRecords: " + numRecordsNum;
-  convert.str("");
+  ss.str("");
 
+  // Set cells in the CDK matrix
   setCDKMatrixCell(myMatrix, 1, 1, magicNum.c_str());
   setCDKMatrixCell(myMatrix, 1, 2, versionNum.c_str());
   setCDKMatrixCell(myMatrix, 1, 3, numRecordsNum.c_str());
+
+  /*
+    Actual instances of the BinaryFileRecord class are
+    in the binary file. 
+
+    So when reading from the file, you must read for 
+    entire BinaryFileRecord objects and not the 
+    individual members.
+   */
+  
+  for(int i = 0; i < 4; i++){
+    file.read(reinterpret_cast<char*>(&record), sizeof(record));
+    
+    string recordStrLength;
+    ss << strlen(record.stringBuffer);
+    recordStrLength = ss.str();
+    recordStrLength = "strlen: " + recordStrLength;
+    ss.str("");
+
+    string recordStrBuffer;
+    ss << record.stringBuffer;
+    recordStrBuffer = ss.str();
+    ss.str("");
+
+    setCDKMatrixCell(myMatrix, i+2, 1, recordStrLength.c_str());
+    setCDKMatrixCell(myMatrix, i+2, 2, recordStrBuffer.c_str());
+  }
   drawCDKMatrix(myMatrix, true);    /* required  */
+  
+  file.close();
 
   /* so we can see results */
   sleep(10);
-
+ 
 
   // Cleanup screen
   endCDK();
